@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@3"></script>
+  <title>Practice</title>
+  <style>
+    .text-color {
+      color: purple;
+    }
+
+    .expert {
+      text-decoration: line-through;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+    <h1 :class="textColor">{{ msg }}</h1>
+    <button @click="increase">{{ count }}</button>
+    <input v-model="text" type="text" :placeholder="inputPlaceholder">
+    <p>{{ text }}</p>
+    <button @click="toggleLike">Toggle like</button>
+    <h2 v-if="like">I like Vue</h2>
+    <h2 v-else>I don't like Vue</h2>
+    <form @submit.prevent="addItem">
+      <input v-model="newItem" type="text" placeholder="add language">
+      <button>Add</button>
+    </form>
+    <ol>
+      <li v-for="item in filteredLangs"><input type="checkbox" v-model="item.expert"> <span
+          :class="{expert: item.expert }">{{ item.text }}</span> <button @click="removeItem(item)">X</button></li>
+    </ol>
+    <button @click="showOnlyExpert = !showOnlyExpert">Toggle expert</button>
+    <h4 ref="mount">Mount</h4>
+    <Component></Component>
+    <Component2 :parentmsg="childMsg"></Component2>
+    <Component3 @post="(msg) => emitMsg = msg"></Component3>
+    <p>{{ emitMsg }}</p>
+    <Component4>Slot: {{ slotMsg }}</Component4>
+
+    
+    <p>Product id: {{ productId }}</p>
+    <button @click="productId++">Fetch next product</button>
+    <pre v-if="productData">{{ productData }}</pre>
+    <pre v-else>Loading...</pre>
+  </div>
+
+
+
+
+
+
+  <script type="module">
+    const {
+      createApp
+    } = Vue
+
+    //To display component run html file on http server,run 'npx serve' from the command line in the same directory where your HTML file
+    import Component from './Component.js' 
+    import Component2 from './Component2.js' 
+    import Component3 from './Component3.js' 
+    import Component4 from './Component4.js' 
+
+    let id = 0
+
+    const app = createApp({
+      components: {
+        Component,
+        Component2,
+        Component3,
+        Component4
+      },
+
+      data() {
+        return {
+          msg: "Hello! Vue",
+          textColor: "text-color",
+          childMsg: "Hello Component, this message is from your parent",
+          emitMsg: "No message from child",
+          slotMsg: "I'm slot message",
+          count: 0,
+          text: "",
+          inputPlaceholder: "Type your text",
+          like: true,
+          showOnlyExpert: false,
+          productId: 1,
+          productData: null,
+          newItem: "",
+          langs: [{
+              id: id++,
+              text: "JavaScript",
+              expert: false
+            },
+            {
+              id: id++,
+              text: "HTML",
+              expert: true
+            },
+            {
+              id: id++,
+              text: "CSS",
+              expert: false
+            }
+          ]
+        }
+      },
+
+      mounted() {
+        this.$refs.mount.textContent = 'Hello! this is a mounted text',
+          this.fetchData()
+      },
+
+
+      computed: {
+        filteredLangs() {
+          return this.showOnlyExpert ?
+            this.langs.filter((i) => i.expert) :
+            this.langs
+        }
+      },
+
+      methods: {
+        increase() {
+          this.count++
+        },
+        toggleLike(e) {
+          e.preventDefault()
+          this.like = !this.like
+        },
+        addItem() {
+          this.langs.push({
+            id: id++,
+            text: this.newItem,
+            expert: false
+          })
+          this.newItem = ""
+        },
+        removeItem(item) {
+          this.langs = this.langs.filter((i) => i !== item)
+        },
+        async fetchData() {
+          this.productData = null
+          const res = await fetch(
+            `https://dummyjson.com/products/${this.productId}`
+          )
+          this.productData = await res.json()
+        }
+      },
+
+      watch: {
+        productId() {
+          this.fetchData()
+        }
+      }
+
+    })
+
+
+
+    app.mount('#app')
+  </script>
+</body>
+
+</html>
