@@ -15,6 +15,15 @@
     .expert {
       text-decoration: line-through;
     }
+
+    #container {
+color: green;
+    }
+
+    .wrapper {
+      font-style: italic;
+      font-weight: 700;
+    }
   </style>
 </head>
 
@@ -44,7 +53,7 @@
     <p>{{ emitMsg }}</p>
     <Component4>Slot: {{ slotMsg }}</Component4>
 
-    
+
     <p>Product id: {{ productId }}</p>
     <button @click="productId++">Fetch next product</button>
     <pre v-if="productData">{{ productData }}</pre>
@@ -52,7 +61,19 @@
   </div>
 
 
-
+  <div id="app2">
+    <h1>{{ msg }}</h1>
+    <p>Using text interpolation: {{ binddingText }}</p>
+    <p>Using v-html directive: <span v-html="binddingText"></span></p>
+    <div v-bind="objectOfAttrs">I have multiple attribute binding</div>
+    <div>{{ number + 1 }}</div>
+    <span :title="showTitle()">
+      {{ showDay() }}
+    </span>
+    <div :[idorclass()]="'trying'">Dynamic Arguments</div>
+    <div @[hoverorclick()]="'idorclass'">Dynamic Arguments(Events)</div>
+    
+  </div>
 
 
 
@@ -62,10 +83,10 @@
     } = Vue
 
     //To display component run html file on http server,run 'npx serve' from the command line in the same directory where your HTML file
-    import Component from './Component.js' 
-    import Component2 from './Component2.js' 
-    import Component3 from './Component3.js' 
-    import Component4 from './Component4.js' 
+    import Component from './Component.js'
+    import Component2 from './Component2.js'
+    import Component3 from './Component3.js'
+    import Component4 from './Component4.js'
 
     let id = 0
 
@@ -164,6 +185,41 @@
 
 
     app.mount('#app')
+
+    const app2 = createApp({
+      data() {
+        return {
+          msg: "This is from app2",
+          binddingText: '<span style="color: red">This should be red.</span>',
+          objectOfAttrs: {
+            id: 'container',
+            class: 'wrapper'
+          },
+          number: 4,
+
+        }
+      },
+
+      methods: {
+        showDay() {
+          const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+         return days[new Date().getDay()]
+        },
+        showTitle() {
+          return "Day of the week"
+        },
+        idorclass() {
+        // Just a "random" behavior
+        return new Date().getDate() % 2 == 0 ? "id" : "class";
+      },
+        hoverorclick() {
+        // Just a "random" behavior
+        return 7 % 2 == 0 ? "focus" : "click";
+      }
+      }
+    })
+
+    app2.mount("#app2")
   </script>
 </body>
 
